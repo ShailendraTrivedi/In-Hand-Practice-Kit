@@ -1,78 +1,56 @@
 package com.inventoryProcessing.Concept9;
 
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * PaymentService for Concept #9.
- * Self-contained within Concept9 folder.
- */
 public class PaymentService {
-    
-    private final Object paymentLock = new Object(); // For deadlock demonstration
-    
-    /**
-     * Get lock object for deadlock demonstration.
-     * ⚠️  Only used in deadlock scenario
-     */
-    public Object getLock() {
-        return paymentLock;
+    private final Map<String, Double> userBalances = new HashMap<>();
+    private final Object lock = new Object();
+
+    public PaymentService() {
+        // Initialize some user balances
+        userBalances.put("USER-101", 1000.0);
+        userBalances.put("USER-102", 500.0);
+        userBalances.put("USER-103", 2000.0);
+        userBalances.put("USER-104", 750.0);
+        userBalances.put("USER-105", 1500.0);
     }
-    
-    /**
-     * Process payment with explicit lock (for deadlock demo).
-     * ⚠️  Uses synchronized block for deadlock demonstration
-     */
-    public boolean processPaymentWithLock(String orderId, double amount) {
-        synchronized (paymentLock) {
-            System.out.println("[PaymentService] Processing payment for: " + orderId);
-            
+
+    public Object getLock() {
+        return lock;
+    }
+
+    public boolean processPayment(String userId, double amount) {
+        synchronized (lock) {
+            Double balance = userBalances.get(userId);
+
+            if (balance == null || balance < amount) {
+                return false;
+            }
+
             try {
-                Thread.sleep(10); // Simulate payment processing
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return false;
             }
-            
-            // Simulate success/failure
-            boolean success = ThreadLocalRandom.current().nextDouble() > 0.1;
-            
-            if (success) {
-                String transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8);
-                System.out.println("[PaymentService] ✓ Payment successful: " + transactionId);
-                return true;
-            } else {
-                System.out.println("[PaymentService] ✗ Payment failed");
-                return false;
-            }
+
+            double newBalance = balance - amount;
+            userBalances.put(userId, newBalance);
+
+            return true;
         }
     }
-    
-    /**
-     * Process payment (thread-safe, no deadlock risk).
-     * ✅ No explicit locking needed
-     */
-    public boolean processPayment(String orderId, double amount) {
-        System.out.println("[PaymentService] Processing payment for: " + orderId);
-        
-        try {
-            Thread.sleep(10); // Simulate payment processing
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        
-        // Simulate success/failure
-        boolean success = ThreadLocalRandom.current().nextDouble() > 0.1;
-        
-        if (success) {
-            String transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8);
-            System.out.println("[PaymentService] ✓ Payment successful: " + transactionId);
-            return true;
-        } else {
-            System.out.println("[PaymentService] ✗ Payment failed");
-            return false;
+
+    public synchronized double getBalance(String userId) {
+        Double balance = userBalances.get(userId);
+        return balance == null ? 0.0 : balance;
+    }
+
+    public boolean hasBalance(String userId, double amount) {
+        synchronized(lock) {
+            Double balance = userBalances.get(userId);
+            return balance != null && balance >= amount;
         }
     }
 }
-

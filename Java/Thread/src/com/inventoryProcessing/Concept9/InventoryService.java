@@ -2,16 +2,16 @@ package com.inventoryProcessing.Concept9;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * InventoryService for Concept #9.
  * Self-contained within Concept9 folder.
+ * Uses synchronized methods for demonstration.
  */
 public class InventoryService {
     
-    private final ConcurrentHashMap<String, Integer> inventory = new ConcurrentHashMap<>();
-    private final Object inventoryLock = new Object(); // For deadlock demonstration
+    private final Map<String, Integer> inventory = new HashMap<>();
+    private final Object lock = new Object(); // Lock object for deadlock demo
     
     public InventoryService() {
         inventory.put("PROD-001", 100);
@@ -22,27 +22,18 @@ public class InventoryService {
     }
     
     /**
-     * Get lock object for deadlock demonstration.
-     * ⚠️  Only used in deadlock scenario
+     * Get the lock object (for deadlock demonstration).
      */
     public Object getLock() {
-        return inventoryLock;
-    }
-    
-    public boolean hasStock(String productId, int quantity) {
-        Integer currentStock = inventory.get(productId);
-        if (currentStock == null) {
-            return false;
-        }
-        return currentStock >= quantity;
+        return lock;
     }
     
     /**
-     * Reserve inventory with explicit lock (for deadlock demo).
-     * ⚠️  Uses synchronized block for deadlock demonstration
+     * Reserve inventory (decrease stock).
+     * Uses synchronized block for deadlock demonstration.
      */
-    public boolean reserveStockWithLock(String productId, int quantity) {
-        synchronized (inventoryLock) {
+    public boolean reserveStock(String productId, int quantity) {
+        synchronized (lock) {
             Integer currentStock = inventory.get(productId);
             
             if (currentStock == null || currentStock < quantity) {
@@ -64,25 +55,20 @@ public class InventoryService {
     }
     
     /**
-     * Reserve inventory (thread-safe, no deadlock risk).
-     * ✅ Uses ConcurrentHashMap atomic operations
+     * Get current stock.
      */
-    public boolean reserveStock(String productId, int quantity) {
-        return inventory.compute(productId, (key, currentStock) -> {
-            if (currentStock == null || currentStock < quantity) {
-                return currentStock;
-            }
-            return currentStock - quantity;
-        }) != null && inventory.get(productId) >= 0;
-    }
-    
-    public int getStock(String productId) {
+    public synchronized int getStock(String productId) {
         Integer stock = inventory.get(productId);
         return stock == null ? 0 : stock;
     }
     
-    public Map<String, Integer> getAllInventory() {
-        return new HashMap<>(inventory);
+    /**
+     * Check if product has enough stock.
+     */
+    public boolean hasStock(String productId, int quantity) {
+        synchronized (lock) {
+            Integer currentStock = inventory.get(productId);
+            return currentStock != null && currentStock >= quantity;
+        }
     }
 }
-
