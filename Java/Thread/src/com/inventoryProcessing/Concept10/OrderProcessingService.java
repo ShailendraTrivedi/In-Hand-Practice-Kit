@@ -79,11 +79,13 @@ public class OrderProcessingService {
         this.mixedExecutor = Executors.newFixedThreadPool(mixedPoolSize);
         
         // ✅ Priority executor: Uses priority queue for fair processing
+        // Note: Must use Comparator with PriorityBlockingQueue because Runnable doesn't implement Comparable
+        // Also use execute() instead of submit() because submit() wraps Runnable in FutureTask
         this.priorityExecutor = new ThreadPoolExecutor(
             2,                          // Core pool size
             cpuCores * 2,               // Maximum pool size
             60L, TimeUnit.SECONDS,      // Keep-alive time
-            new PriorityBlockingQueue<>(), // Priority queue
+            new PriorityBlockingQueue<Runnable>(11, new PriorityTaskComparator()), // Priority queue with Comparator
             new ThreadFactory() {
                 private int count = 0;
                 @Override
@@ -150,9 +152,11 @@ public class OrderProcessingService {
     /**
      * Process order with priority.
      * ✅ Uses priority executor for fair processing
+     * Note: Uses execute() instead of submit() because PriorityBlockingQueue
+     * requires Comparable tasks, and submit() wraps Runnable in FutureTask
      */
     public void processOrderWithPriority(Order order) {
-        priorityExecutor.submit(new PriorityTask(order));
+        priorityExecutor.execute(new PriorityTask(order));
     }
     
     /**
@@ -190,6 +194,10 @@ public class OrderProcessingService {
         for (int i = 0; i < 1000000; i++) {
             result += i * order.getQuantity();
         }
+        // Result used for simulation (prevent optimization)
+        if (result < 0) {
+            System.out.println("Unexpected result");
+        }
     }
     
     /**
@@ -203,13 +211,21 @@ public class OrderProcessingService {
     /**
      * Priority task for priority executor.
      */
-    private static class PriorityTask implements Runnable, Comparable<PriorityTask> {
+    private static class PriorityTask implements Runnable {
         private final Order order;
         private final long timestamp;
         
         public PriorityTask(Order order) {
             this.order = order;
             this.timestamp = System.currentTimeMillis();
+        }
+        
+        public Order getOrder() {
+            return order;
+        }
+        
+        public long getTimestamp() {
+            return timestamp;
         }
         
         @Override
@@ -230,20 +246,29 @@ public class OrderProcessingService {
                 System.err.println("[Priority-Task] ✗ Error: " + e.getMessage());
             }
         }
-        
-        /**
-         * Compare by priority, then by timestamp (FIFO for same priority).
-         * ✅ Ensures high-priority tasks run first, but same-priority tasks are fair
-         */
+    }
+    
+    /**
+     * Comparator for PriorityTask.
+     * ✅ Compares by priority, then by timestamp (FIFO for same priority)
+     */
+    private static class PriorityTaskComparator implements java.util.Comparator<Runnable> {
         @Override
-        public int compareTo(PriorityTask other) {
+        public int compare(Runnable r1, Runnable r2) {
+            if (!(r1 instanceof PriorityTask) || !(r2 instanceof PriorityTask)) {
+                return 0; // Fallback for non-PriorityTask runnables
+            }
+            
+            PriorityTask task1 = (PriorityTask) r1;
+            PriorityTask task2 = (PriorityTask) r2;
+            
             // Higher priority first
-            int priorityCompare = other.order.getPriority().compareTo(this.order.getPriority());
+            int priorityCompare = task2.getOrder().getPriority().compareTo(task1.getOrder().getPriority());
             if (priorityCompare != 0) {
                 return priorityCompare;
             }
             // Same priority: FIFO (older first)
-            return Long.compare(this.timestamp, other.timestamp);
+            return Long.compare(task1.getTimestamp(), task2.getTimestamp());
         }
     }
     
