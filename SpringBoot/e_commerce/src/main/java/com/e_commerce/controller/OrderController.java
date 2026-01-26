@@ -1,5 +1,6 @@
 package com.e_commerce.controller;
 
+import com.e_commerce.dto.PaginationResponse;
 import com.e_commerce.model.Order;
 import com.e_commerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,16 @@ public class OrderController {
     
     @Autowired
     private OrderService orderService;
+    
+    // GET - Get all orders with pagination
+    @GetMapping
+    public PaginationResponse<Order> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction) {
+        return orderService.getAllOrders(page, size, sortBy, direction);
+    }
     
     // POST - Create order
     @PostMapping

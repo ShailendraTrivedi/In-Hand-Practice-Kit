@@ -1,13 +1,12 @@
 package com.e_commerce.controller;
 
+import com.e_commerce.dto.PaginationResponse;
 import com.e_commerce.model.DigitalProduct;
 import com.e_commerce.model.PhysicalProduct;
 import com.e_commerce.model.Product;
 import com.e_commerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -18,8 +17,12 @@ public class ProductController {
     
     // GET all products
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public PaginationResponse<Product> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction) {
+        return productService.getAllProducts(page, size, sortBy, direction);
     }
     
     // GET product by id - will throw ProductNotFoundException if not found
