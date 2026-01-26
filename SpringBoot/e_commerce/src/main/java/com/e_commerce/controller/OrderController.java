@@ -14,7 +14,6 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
     
-    // GET - Get all orders with pagination
     @GetMapping
     public PaginationResponse<Order> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
@@ -24,7 +23,6 @@ public class OrderController {
         return orderService.getAllOrders(page, size, sortBy, direction);
     }
     
-    // POST - Create order with idempotency support
     @PostMapping
     public Order createOrder(
             @RequestBody OrderRequest request,
@@ -32,7 +30,6 @@ public class OrderController {
         return orderService.createOrder(request.getProductId(), request.getQuantity(), idempotencyKey);
     }
     
-    // GET - Get order status
     @GetMapping("/status/{id}")
     public Order getOrderStatus(@PathVariable Long id) {
         Order order = orderService.getOrderStatus(id);
@@ -42,7 +39,6 @@ public class OrderController {
         return order;
     }
     
-    // Inner class for request body
     public static class OrderRequest {
         private Long productId;
         private Integer quantity;

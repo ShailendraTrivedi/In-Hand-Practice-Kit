@@ -5,10 +5,8 @@ public abstract class Product {
     private String name;
     private Double price;
     
-    // Constructors
     public Product() {}
     
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -33,10 +31,8 @@ public abstract class Product {
         this.price = price;
     }
     
-    // Abstract method - must be implemented by subclasses
     public abstract String getProductType();
     
-    // equals() method - compares products by id, name, and price
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -58,7 +54,6 @@ public abstract class Product {
         return true;
     }
     
-    // hashCode() method - must be consistent with equals()
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;

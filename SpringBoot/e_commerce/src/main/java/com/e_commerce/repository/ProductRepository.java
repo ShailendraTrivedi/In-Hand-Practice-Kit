@@ -22,7 +22,6 @@ public class ProductRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // RowMapper for Product (JDBC concept)
     private final RowMapper<Product> productRowMapper = new RowMapper<Product>() {
         @Override
         public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -52,7 +51,6 @@ public class ProductRepository {
         }
     };
 
-    // Create product using JDBC
     public Product save(Product product) {
         String sql;
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,16 +85,13 @@ public class ProductRepository {
             throw new IllegalArgumentException("Unknown product type");
         }
 
-        // Get the ID from the key holder (handle multiple keys)
         Map<String, Object> keys = keyHolder.getKeys();
         Long generatedId = ((Number) keys.get("ID")).longValue();
         product.setId(generatedId);
         return product;
     }
 
-    // Find all products using JDBC with pagination
     public List<Product> findAll(int page, int size, String sortBy, String direction) {
-        // Validate and sanitize sortBy to prevent SQL injection
         String validSortBy = validateSortColumn(sortBy);
         String validDirection = "DESC".equalsIgnoreCase(direction) ? "DESC" : "ASC";
 
@@ -106,40 +101,34 @@ public class ProductRepository {
         return jdbcTemplate.query(sql, productRowMapper, size, offset);
     }
 
-    // Count total products
     public long count() {
         String sql = "SELECT COUNT(*) FROM products";
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
         return count != null ? count : 0L;
     }
 
-    // Validate sort column to prevent SQL injection
     private String validateSortColumn(String sortBy) {
-        // Whitelist of allowed columns
         String[] allowedColumns = { "id", "name", "price", "product_type", "created_at" };
         for (String column : allowedColumns) {
             if (column.equalsIgnoreCase(sortBy)) {
                 return column;
             }
         }
-        return "id"; // Default to id if invalid
+        return "id";
     }
 
-    // Find product by ID using JDBC
     public Product findById(Long id) {
         String sql = "SELECT * FROM products WHERE id = ?";
         List<Product> products = jdbcTemplate.query(sql, productRowMapper, id);
         return products.isEmpty() ? null : products.get(0);
     }
 
-    // Delete product using JDBC
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM products WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
         return rowsAffected > 0;
     }
 
-    // Check if product exists (for duplicate checking)
     public boolean existsByNameAndPrice(String name, Double price) {
         String sql = "SELECT COUNT(*) FROM products WHERE name = ? AND price = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name, price);

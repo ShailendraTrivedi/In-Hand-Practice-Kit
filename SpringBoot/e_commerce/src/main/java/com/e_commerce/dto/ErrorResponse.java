@@ -17,7 +17,6 @@ public class ErrorResponse {
         this.path = path;
     }
     
-    // Getters
     public LocalDateTime getTimestamp() {
         return timestamp;
     }

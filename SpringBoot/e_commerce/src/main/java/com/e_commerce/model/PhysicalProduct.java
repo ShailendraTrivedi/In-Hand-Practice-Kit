@@ -4,12 +4,10 @@ public class PhysicalProduct extends Product {
     private Double weight;
     private String shippingAddress;
     
-    // Constructors
     public PhysicalProduct() {
         super();
     }
     
-    // Getters and Setters
     public Double getWeight() {
         return weight;
     }
@@ -26,7 +24,6 @@ public class PhysicalProduct extends Product {
         this.shippingAddress = shippingAddress;
     }
     
-    // Implement abstract method from Product
     @Override
     public String getProductType() {
         return "Physical";

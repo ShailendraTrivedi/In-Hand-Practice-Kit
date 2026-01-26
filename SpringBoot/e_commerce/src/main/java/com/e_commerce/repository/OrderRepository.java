@@ -20,7 +20,6 @@ public class OrderRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // RowMapper for Order (JDBC concept)
     private final RowMapper<Order> orderRowMapper = new RowMapper<Order>() {
         @Override
         public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -38,7 +37,6 @@ public class OrderRepository {
         }
     };
 
-    // Save order using JDBC
     public Order save(Order order) {
         String sql = "INSERT INTO orders (product_id, quantity, total_amount, status, idempotency_key) VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -58,7 +56,6 @@ public class OrderRepository {
         return order;
     }
 
-    // Find order by idempotency key
     public Order findByIdempotencyKey(String idempotencyKey) {
         if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
             return null;
@@ -68,16 +65,13 @@ public class OrderRepository {
         return orders.isEmpty() ? null : orders.get(0);
     }
 
-    // Find order by ID using JDBC
     public Order findById(Long id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
         List<Order> orders = jdbcTemplate.query(sql, orderRowMapper, id);
         return orders.isEmpty() ? null : orders.get(0);
     }
 
-    // Find all orders using JDBC with pagination
     public List<Order> findAll(int page, int size, String sortBy, String direction) {
-        // Validate and sanitize sortBy to prevent SQL injection
         String validSortBy = validateSortColumn(sortBy);
         String validDirection = "DESC".equalsIgnoreCase(direction) ? "DESC" : "ASC";
 
@@ -87,16 +81,13 @@ public class OrderRepository {
         return jdbcTemplate.query(sql, orderRowMapper, size, offset);
     }
 
-    // Count total orders
     public long count() {
         String sql = "SELECT COUNT(*) FROM orders";
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
         return count != null ? count : 0L;
     }
 
-    // Validate sort column to prevent SQL injection
     private String validateSortColumn(String sortBy) {
-        // Whitelist of allowed columns
         String[] allowedColumns = { "id", "product_id", "quantity", "total_amount", "status", "created_at",
                 "updated_at" };
         for (String column : allowedColumns) {
@@ -104,6 +95,6 @@ public class OrderRepository {
                 return column;
             }
         }
-        return "created_at"; // Default to created_at if invalid
+        return "created_at";
     }
 }

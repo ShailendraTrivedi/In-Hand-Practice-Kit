@@ -4,12 +4,10 @@ public class DigitalProduct extends Product {
     private String downloadLink;
     private Long fileSizeInMB;
     
-    // Constructors
     public DigitalProduct() {
         super();
     }
     
-    // Getters and Setters
     public String getDownloadLink() {
         return downloadLink;
     }
@@ -26,7 +24,6 @@ public class DigitalProduct extends Product {
         this.fileSizeInMB = fileSizeInMB;
     }
     
-    // Implement abstract method from Product
     @Override
     public String getProductType() {
         return "Digital";

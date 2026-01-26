@@ -15,12 +15,10 @@ public class Order {
         FAILED
     }
     
-    // Constructors
     public Order() {
         this.status = OrderStatus.PENDING;
     }
     
-    // Getters and Setters
     public Long getId() {
         return id;
     }

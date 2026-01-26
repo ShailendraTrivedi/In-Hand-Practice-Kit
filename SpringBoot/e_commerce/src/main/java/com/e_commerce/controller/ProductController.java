@@ -15,7 +15,6 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     
-    // GET all products
     @GetMapping
     public PaginationResponse<Product> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
@@ -25,25 +24,21 @@ public class ProductController {
         return productService.getAllProducts(page, size, sortBy, direction);
     }
     
-    // GET product by id - will throw ProductNotFoundException if not found
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
     
-    // POST - Create physical product
     @PostMapping("/physical")
     public PhysicalProduct createPhysicalProduct(@RequestBody PhysicalProduct product) {
         return (PhysicalProduct) productService.createProduct(product);
     }
     
-    // POST - Create digital product
     @PostMapping("/digital")
     public DigitalProduct createDigitalProduct(@RequestBody DigitalProduct product) {
         return (DigitalProduct) productService.createProduct(product);
     }
     
-    // DELETE product by id
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable Long id) {
         boolean deleted = productService.deleteProduct(id);

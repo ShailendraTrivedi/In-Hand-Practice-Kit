@@ -21,7 +21,6 @@ public class PaginationResponse<T> {
         this.last = page >= totalPages - 1;
     }
     
-    // Getters
     public List<T> getContent() {
         return content;
     }
