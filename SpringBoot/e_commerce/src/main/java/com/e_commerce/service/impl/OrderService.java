@@ -1,24 +1,25 @@
-package com.e_commerce.service;
+package com.e_commerce.service.impl;
 
-import com.e_commerce.dto.PaginationResponse;
-import com.e_commerce.model.Product;
-import com.e_commerce.model.Order;
-import com.e_commerce.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.e_commerce.dto.response.PaginationResponse;
+import com.e_commerce.entity.Order;
+import com.e_commerce.entity.Product;
+import com.e_commerce.repository.IOrderRepository;
+import com.e_commerce.service.IOrderService;
+import com.e_commerce.service.IProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class OrderService {
+@RequiredArgsConstructor
+public class OrderService implements IOrderService {
 
-    @Autowired
-    private ProductService productService;
+    private final IProductService productService;
+    private final IOrderRepository orderRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
-
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Order createOrder(Long productId, Integer quantity, String idempotencyKey) {
         if (idempotencyKey != null && !idempotencyKey.trim().isEmpty()) {
@@ -42,13 +43,16 @@ public class OrderService {
         return order;
     }
 
+    @Override
     public Order getOrderStatus(Long orderId) {
         return orderRepository.findById(orderId);
     }
 
+    @Override
     public PaginationResponse<Order> getAllOrders(int page, int size, String sortBy, String direction) {
         List<Order> orders = orderRepository.findAll(page, size, sortBy, direction);
         long totalElements = orderRepository.count();
         return new PaginationResponse<>(orders, page, size, totalElements);
     }
 }
+

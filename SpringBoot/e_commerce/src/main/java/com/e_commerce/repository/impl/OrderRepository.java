@@ -1,7 +1,8 @@
-package com.e_commerce.repository;
+package com.e_commerce.repository.impl;
 
-import com.e_commerce.model.Order;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.e_commerce.entity.Order;
+import com.e_commerce.repository.IOrderRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,10 +16,10 @@ import java.sql.Statement;
 import java.util.List;
 
 @Repository
-public class OrderRepository {
+@RequiredArgsConstructor
+public class OrderRepository implements IOrderRepository {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<Order> orderRowMapper = new RowMapper<Order>() {
         @Override
@@ -37,6 +38,7 @@ public class OrderRepository {
         }
     };
 
+    @Override
     public Order save(Order order) {
         String sql = "INSERT INTO orders (product_id, quantity, total_amount, status, idempotency_key) VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -56,6 +58,7 @@ public class OrderRepository {
         return order;
     }
 
+    @Override
     public Order findByIdempotencyKey(String idempotencyKey) {
         if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
             return null;
@@ -65,12 +68,14 @@ public class OrderRepository {
         return orders.isEmpty() ? null : orders.get(0);
     }
 
+    @Override
     public Order findById(Long id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
         List<Order> orders = jdbcTemplate.query(sql, orderRowMapper, id);
         return orders.isEmpty() ? null : orders.get(0);
     }
 
+    @Override
     public List<Order> findAll(int page, int size, String sortBy, String direction) {
         String validSortBy = validateSortColumn(sortBy);
         String validDirection = "DESC".equalsIgnoreCase(direction) ? "DESC" : "ASC";
@@ -81,6 +86,7 @@ public class OrderRepository {
         return jdbcTemplate.query(sql, orderRowMapper, size, offset);
     }
 
+    @Override
     public long count() {
         String sql = "SELECT COUNT(*) FROM orders";
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
@@ -98,3 +104,4 @@ public class OrderRepository {
         return "created_at";
     }
 }
+

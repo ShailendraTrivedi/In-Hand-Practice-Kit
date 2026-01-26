@@ -1,7 +1,10 @@
-package com.e_commerce.dto;
+package com.e_commerce.dto.response;
+
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
@@ -16,24 +19,5 @@ public class ErrorResponse {
         this.message = message;
         this.path = path;
     }
-    
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-    
-    public int getStatus() {
-        return status;
-    }
-    
-    public String getErrorCode() {
-        return errorCode;
-    }
-    
-    public String getMessage() {
-        return message;
-    }
-    
-    public String getPath() {
-        return path;
-    }
 }
+

@@ -1,6 +1,6 @@
 package com.e_commerce.exception;
 
-import com.e_commerce.dto.ErrorResponse;
+import com.e_commerce.dto.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

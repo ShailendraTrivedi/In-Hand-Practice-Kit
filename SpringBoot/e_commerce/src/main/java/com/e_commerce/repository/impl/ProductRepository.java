@@ -1,9 +1,10 @@
-package com.e_commerce.repository;
+package com.e_commerce.repository.impl;
 
-import com.e_commerce.model.DigitalProduct;
-import com.e_commerce.model.PhysicalProduct;
-import com.e_commerce.model.Product;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.e_commerce.entity.DigitalProduct;
+import com.e_commerce.entity.PhysicalProduct;
+import com.e_commerce.entity.Product;
+import com.e_commerce.repository.IProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -17,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class ProductRepository {
+@RequiredArgsConstructor
+public class ProductRepository implements IProductRepository {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<Product> productRowMapper = new RowMapper<Product>() {
         @Override
@@ -51,6 +52,7 @@ public class ProductRepository {
         }
     };
 
+    @Override
     public Product save(Product product) {
         String sql;
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -91,6 +93,7 @@ public class ProductRepository {
         return product;
     }
 
+    @Override
     public List<Product> findAll(int page, int size, String sortBy, String direction) {
         String validSortBy = validateSortColumn(sortBy);
         String validDirection = "DESC".equalsIgnoreCase(direction) ? "DESC" : "ASC";
@@ -101,6 +104,7 @@ public class ProductRepository {
         return jdbcTemplate.query(sql, productRowMapper, size, offset);
     }
 
+    @Override
     public long count() {
         String sql = "SELECT COUNT(*) FROM products";
         Long count = jdbcTemplate.queryForObject(sql, Long.class);
@@ -117,21 +121,25 @@ public class ProductRepository {
         return "id";
     }
 
+    @Override
     public Product findById(Long id) {
         String sql = "SELECT * FROM products WHERE id = ?";
         List<Product> products = jdbcTemplate.query(sql, productRowMapper, id);
         return products.isEmpty() ? null : products.get(0);
     }
 
+    @Override
     public boolean deleteById(Long id) {
         String sql = "DELETE FROM products WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
         return rowsAffected > 0;
     }
 
+    @Override
     public boolean existsByNameAndPrice(String name, Double price) {
         String sql = "SELECT COUNT(*) FROM products WHERE name = ? AND price = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name, price);
         return count != null && count > 0;
     }
 }
+

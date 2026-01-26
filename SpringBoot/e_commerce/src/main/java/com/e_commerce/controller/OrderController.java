@@ -1,18 +1,19 @@
 package com.e_commerce.controller;
 
-import com.e_commerce.dto.PaginationResponse;
+import com.e_commerce.dto.response.PaginationResponse;
+import com.e_commerce.entity.Order;
 import com.e_commerce.exception.OrderNotFoundException;
-import com.e_commerce.model.Order;
-import com.e_commerce.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.e_commerce.service.IOrderService;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
+@RequiredArgsConstructor
 public class OrderController {
     
-    @Autowired
-    private OrderService orderService;
+    private final IOrderService orderService;
     
     @GetMapping
     public PaginationResponse<Order> getAllOrders(
@@ -39,24 +40,9 @@ public class OrderController {
         return order;
     }
     
+    @Data
     public static class OrderRequest {
         private Long productId;
         private Integer quantity;
-        
-        public Long getProductId() {
-            return productId;
-        }
-        
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-        
-        public Integer getQuantity() {
-            return quantity;
-        }
-        
-        public void setQuantity(Integer quantity) {
-            this.quantity = quantity;
-        }
     }
 }

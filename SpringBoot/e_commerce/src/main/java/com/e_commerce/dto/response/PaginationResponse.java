@@ -1,7 +1,10 @@
-package com.e_commerce.dto;
+package com.e_commerce.dto.response;
+
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class PaginationResponse<T> {
     private List<T> content;
     private int page;
@@ -20,32 +23,5 @@ public class PaginationResponse<T> {
         this.first = page == 0;
         this.last = page >= totalPages - 1;
     }
-    
-    public List<T> getContent() {
-        return content;
-    }
-    
-    public int getPage() {
-        return page;
-    }
-    
-    public int getSize() {
-        return size;
-    }
-    
-    public long getTotalElements() {
-        return totalElements;
-    }
-    
-    public int getTotalPages() {
-        return totalPages;
-    }
-    
-    public boolean isFirst() {
-        return first;
-    }
-    
-    public boolean isLast() {
-        return last;
-    }
 }
+

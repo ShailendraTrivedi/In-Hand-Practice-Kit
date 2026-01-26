@@ -1,19 +1,19 @@
 package com.e_commerce.controller;
 
-import com.e_commerce.dto.PaginationResponse;
-import com.e_commerce.model.DigitalProduct;
-import com.e_commerce.model.PhysicalProduct;
-import com.e_commerce.model.Product;
-import com.e_commerce.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.e_commerce.dto.response.PaginationResponse;
+import com.e_commerce.entity.DigitalProduct;
+import com.e_commerce.entity.PhysicalProduct;
+import com.e_commerce.entity.Product;
+import com.e_commerce.service.IProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
     
-    @Autowired
-    private ProductService productService;
+    private final IProductService productService;
     
     @GetMapping
     public PaginationResponse<Product> getAllProducts(
