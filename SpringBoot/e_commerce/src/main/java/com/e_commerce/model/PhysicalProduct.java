@@ -1,18 +1,12 @@
 package com.e_commerce.model;
 
-public class PhysicalProduct extends Product implements Taxable {
+public class PhysicalProduct extends Product {
     private Double weight;
     private String shippingAddress;
     
     // Constructors
     public PhysicalProduct() {
         super();
-    }
-    
-    public PhysicalProduct(Long id, String name, Double price, Double weight, String shippingAddress) {
-        super(id, name, price);
-        this.weight = weight;
-        this.shippingAddress = shippingAddress;
     }
     
     // Getters and Setters
@@ -36,16 +30,5 @@ public class PhysicalProduct extends Product implements Taxable {
     @Override
     public String getProductType() {
         return "Physical";
-    }
-    
-    // Implement Taxable interface methods
-    @Override
-    public double calculateTax() {
-        return getPrice() * getTaxRate();
-    }
-    
-    @Override
-    public double getTaxRate() {
-        return 0.10; // 10% tax for physical products
     }
 }

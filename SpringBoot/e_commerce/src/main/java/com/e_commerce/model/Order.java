@@ -20,14 +20,6 @@ public class Order {
         this.status = OrderStatus.PENDING;
     }
     
-    public Order(Long id, Long productId, Integer quantity, Double totalAmount) {
-        this.id = id;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.totalAmount = totalAmount;
-        this.status = OrderStatus.PENDING;
-    }
-    
     // Getters and Setters
     public Long getId() {
         return id;

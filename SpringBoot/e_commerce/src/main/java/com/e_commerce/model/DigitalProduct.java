@@ -9,12 +9,6 @@ public class DigitalProduct extends Product {
         super();
     }
     
-    public DigitalProduct(Long id, String name, Double price, String downloadLink, Long fileSizeInMB) {
-        super(id, name, price);
-        this.downloadLink = downloadLink;
-        this.fileSizeInMB = fileSizeInMB;
-    }
-    
     // Getters and Setters
     public String getDownloadLink() {
         return downloadLink;

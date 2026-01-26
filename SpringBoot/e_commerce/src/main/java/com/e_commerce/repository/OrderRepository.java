@@ -75,12 +75,6 @@ public class OrderRepository {
         return orders.isEmpty() ? null : orders.get(0);
     }
 
-    // Update order status using JDBC
-    public void updateStatus(Long id, Order.OrderStatus status) {
-        String sql = "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
-        jdbcTemplate.update(sql, status.name(), id);
-    }
-
     // Find all orders using JDBC with pagination
     public List<Order> findAll(int page, int size, String sortBy, String direction) {
         // Validate and sanitize sortBy to prevent SQL injection

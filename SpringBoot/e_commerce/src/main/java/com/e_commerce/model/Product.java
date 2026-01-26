@@ -8,12 +8,6 @@ public abstract class Product {
     // Constructors
     public Product() {}
     
-    public Product(Long id, String name, Double price) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-    }
-    
     // Getters and Setters
     public Long getId() {
         return id;

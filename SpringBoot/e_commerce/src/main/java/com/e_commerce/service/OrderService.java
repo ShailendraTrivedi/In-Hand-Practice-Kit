@@ -57,12 +57,6 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    // Update order status in database - Transactional for consistency
-    @Transactional(rollbackFor = Exception.class)
-    public void updateOrderStatus(Long orderId, Order.OrderStatus status) {
-        orderRepository.updateStatus(orderId, status);
-    }
-
     // Get all orders from database with pagination
     public PaginationResponse<Order> getAllOrders(int page, int size, String sortBy, String direction) {
         List<Order> orders = orderRepository.findAll(page, size, sortBy, direction);
