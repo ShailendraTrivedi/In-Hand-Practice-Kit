@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS orders (
     quantity INTEGER NOT NULL,
     total_amount DOUBLE NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    idempotency_key VARCHAR(255) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id)
@@ -23,4 +24,5 @@ CREATE TABLE IF NOT EXISTS orders (
 
 CREATE INDEX IF NOT EXISTS idx_product_type ON products(product_type);
 CREATE INDEX IF NOT EXISTS idx_order_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_order_idempotency_key ON orders(idempotency_key);
 CREATE INDEX IF NOT EXISTS idx_order_product_id ON orders(product_id);

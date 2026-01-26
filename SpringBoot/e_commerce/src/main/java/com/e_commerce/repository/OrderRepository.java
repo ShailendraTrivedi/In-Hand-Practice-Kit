@@ -30,13 +30,17 @@ public class OrderRepository {
             order.setQuantity(rs.getInt("quantity"));
             order.setTotalAmount(rs.getDouble("total_amount"));
             order.setStatus(Order.OrderStatus.valueOf(rs.getString("status")));
+            String idempotencyKey = rs.getString("idempotency_key");
+            if (!rs.wasNull()) {
+                order.setIdempotencyKey(idempotencyKey);
+            }
             return order;
         }
     };
 
     // Save order using JDBC
     public Order save(Order order) {
-        String sql = "INSERT INTO orders (product_id, quantity, total_amount, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO orders (product_id, quantity, total_amount, status, idempotency_key) VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -45,12 +49,23 @@ public class OrderRepository {
             ps.setInt(2, order.getQuantity());
             ps.setDouble(3, order.getTotalAmount());
             ps.setString(4, order.getStatus().name());
+            ps.setString(5, order.getIdempotencyKey());
             return ps;
         }, keyHolder);
 
         Long generatedId = keyHolder.getKey().longValue();
         order.setId(generatedId);
         return order;
+    }
+
+    // Find order by idempotency key
+    public Order findByIdempotencyKey(String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.trim().isEmpty()) {
+            return null;
+        }
+        String sql = "SELECT * FROM orders WHERE idempotency_key = ?";
+        List<Order> orders = jdbcTemplate.query(sql, orderRowMapper, idempotencyKey);
+        return orders.isEmpty() ? null : orders.get(0);
     }
 
     // Find order by ID using JDBC

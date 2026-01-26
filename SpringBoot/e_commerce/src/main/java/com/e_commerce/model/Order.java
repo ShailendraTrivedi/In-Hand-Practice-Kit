@@ -6,6 +6,7 @@ public class Order {
     private Integer quantity;
     private OrderStatus status;
     private Double totalAmount;
+    private String idempotencyKey;
     
     public enum OrderStatus {
         PENDING,
@@ -66,5 +67,13 @@ public class Order {
     
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+    
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
     }
 }

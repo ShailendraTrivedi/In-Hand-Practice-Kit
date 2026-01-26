@@ -1,0 +1,42 @@
+# Production Environment Configuration
+spring:
+  datasource:
+    # Production database (MySQL/PostgreSQL example)
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ecommerce?useSSL=true&serverTimezone=UTC}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:10}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # H2 Console disabled in production
+  h2:
+    console:
+      enabled: false
+
+# Logging - Production appropriate
+logging:
+  level:
+    root: WARN
+    com.e_commerce: INFO
+    org.springframework: WARN
+    org.springframework.jdbc: ERROR
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: ${LOG_FILE:logs/ecommerce.log}
+    max-size: 10MB
+    max-history: 30
+
+# Server Configuration for Production
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never  # Hide stack traces in production

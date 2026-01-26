@@ -1,6 +1,7 @@
 package com.e_commerce.controller;
 
 import com.e_commerce.dto.PaginationResponse;
+import com.e_commerce.exception.OrderNotFoundException;
 import com.e_commerce.model.Order;
 import com.e_commerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,12 @@ public class OrderController {
         return orderService.getAllOrders(page, size, sortBy, direction);
     }
     
-    // POST - Create order
+    // POST - Create order with idempotency support
     @PostMapping
-    public Order createOrder(@RequestBody OrderRequest request) {
-        return orderService.createOrder(request.getProductId(), request.getQuantity());
+    public Order createOrder(
+            @RequestBody OrderRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        return orderService.createOrder(request.getProductId(), request.getQuantity(), idempotencyKey);
     }
     
     // GET - Get order status
@@ -34,7 +37,7 @@ public class OrderController {
     public Order getOrderStatus(@PathVariable Long id) {
         Order order = orderService.getOrderStatus(id);
         if (order == null) {
-            throw new RuntimeException("Order not found");
+            throw new OrderNotFoundException(id);
         }
         return order;
     }
