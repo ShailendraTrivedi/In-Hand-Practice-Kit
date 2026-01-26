@@ -1,0 +1,74 @@
+package com.e_commerce.repository;
+
+import com.e_commerce.model.Order;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
+@Repository
+public class OrderRepository {
+    
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    
+    // RowMapper for Order (JDBC concept)
+    private final RowMapper<Order> orderRowMapper = new RowMapper<Order>() {
+        @Override
+        public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Order order = new Order();
+            order.setId(rs.getLong("id"));
+            order.setProductId(rs.getLong("product_id"));
+            order.setQuantity(rs.getInt("quantity"));
+            order.setTotalAmount(rs.getDouble("total_amount"));
+            order.setStatus(Order.OrderStatus.valueOf(rs.getString("status")));
+            return order;
+        }
+    };
+    
+    // Save order using JDBC
+    public Order save(Order order) {
+        String sql = "INSERT INTO orders (product_id, quantity, total_amount, status) VALUES (?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, order.getProductId());
+            ps.setInt(2, order.getQuantity());
+            ps.setDouble(3, order.getTotalAmount());
+            ps.setString(4, order.getStatus().name());
+            return ps;
+        }, keyHolder);
+        
+        Long generatedId = keyHolder.getKey().longValue();
+        order.setId(generatedId);
+        return order;
+    }
+    
+    // Find order by ID using JDBC
+    public Order findById(Long id) {
+        String sql = "SELECT * FROM orders WHERE id = ?";
+        List<Order> orders = jdbcTemplate.query(sql, orderRowMapper, id);
+        return orders.isEmpty() ? null : orders.get(0);
+    }
+    
+    // Update order status using JDBC
+    public void updateStatus(Long id, Order.OrderStatus status) {
+        String sql = "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        jdbcTemplate.update(sql, status.name(), id);
+    }
+    
+    // Find all orders using JDBC
+    public List<Order> findAll() {
+        String sql = "SELECT * FROM orders ORDER BY created_at DESC";
+        return jdbcTemplate.query(sql, orderRowMapper);
+    }
+}
