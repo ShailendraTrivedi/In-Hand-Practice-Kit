@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class ProductRepository implements IProductRepository {
             sql = "INSERT INTO products (name, price, product_type, weight, shipping_address) VALUES (?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, physicalProduct.getName());
                 ps.setDouble(2, physicalProduct.getPrice());
                 ps.setString(3, "Physical");
@@ -75,7 +76,7 @@ public class ProductRepository implements IProductRepository {
             sql = "INSERT INTO products (name, price, product_type, download_link, file_size_mb) VALUES (?, ?, ?, ?, ?)";
 
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, digitalProduct.getName());
                 ps.setDouble(2, digitalProduct.getPrice());
                 ps.setString(3, "Digital");
@@ -88,8 +89,17 @@ public class ProductRepository implements IProductRepository {
         }
 
         Map<String, Object> keys = keyHolder.getKeys();
-        Long generatedId = ((Number) keys.get("ID")).longValue();
-        product.setId(generatedId);
+        if (keys != null && !keys.isEmpty()) {
+            // PostgreSQL returns keys in lowercase, try both cases
+            Object idValue = keys.get("id");
+            if (idValue == null) {
+                idValue = keys.get("ID");
+            }
+            if (idValue != null) {
+                Long generatedId = ((Number) idValue).longValue();
+                product.setId(generatedId);
+            }
+        }
         return product;
     }
 

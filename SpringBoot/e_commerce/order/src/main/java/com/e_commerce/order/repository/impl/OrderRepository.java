@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class OrderRepository implements IOrderRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, order.getProductId());
             ps.setInt(2, order.getQuantity());
             ps.setDouble(3, order.getTotalAmount());
@@ -54,8 +55,17 @@ public class OrderRepository implements IOrderRepository {
         }, keyHolder);
 
         Map<String, Object> keys = keyHolder.getKeys();
-        Long generatedId = ((Number) keys.get("ID")).longValue();
-        order.setId(generatedId);
+        if (keys != null && !keys.isEmpty()) {
+            // PostgreSQL returns keys in lowercase, try both cases
+            Object idValue = keys.get("id");
+            if (idValue == null) {
+                idValue = keys.get("ID");
+            }
+            if (idValue != null) {
+                Long generatedId = ((Number) idValue).longValue();
+                order.setId(generatedId);
+            }
+        }
         return order;
     }
 
