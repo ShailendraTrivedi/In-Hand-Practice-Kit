@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "user-management-api",
-		"name": "User Management API",
-		"description": "Complete API collection for User Management System with JWT Authentication",
+		"name": "User Management API v1",
+		"description": "Complete API collection for User Management System with JWT Authentication - Version 1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -38,13 +38,14 @@
 							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"Password123\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/register",
+							"raw": "{{baseUrl}}/api/v1/auth/register",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
+								"v1",
+								"auth",
 								"register"
 							]
 						}
@@ -82,23 +83,19 @@
 							"raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/login",
+							"raw": "{{baseUrl}}/api/v1/auth/login",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
+								"v1",
+								"auth",
 								"login"
 							]
 						}
 					}
-				}
-			]
-		},
-		{
-			"name": "User Management",
-			"item": [
+				},
 				{
 					"name": "Get Current User Profile",
 					"request": {
@@ -115,18 +112,24 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/users/profile",
+							"raw": "{{baseUrl}}/api/v1/auth/profile",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
+								"v1",
+								"auth",
 								"profile"
 							]
 						}
 					}
-				},
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
 				{
 					"name": "Get All Users",
 					"request": {
@@ -143,12 +146,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/users",
+							"raw": "{{baseUrl}}/api/v1/users",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"v1",
 								"users"
 							]
 						}
@@ -170,12 +174,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"v1",
 								"users",
 								"{{userId}}"
 							]
@@ -198,12 +203,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"v1",
 								"users",
 								"{{userId}}"
 							]
@@ -235,15 +241,182 @@
 							"raw": "{\n    \"roles\": [\"ADMIN\", \"USER\"]\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/users/{{userId}}/roles",
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"v1",
 								"users",
 								"{{userId}}",
 								"roles"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Role Management",
+			"item": [
+				{
+					"name": "Create Role (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleName\": \"MANAGER\",\n    \"roleDescription\": \"Manager role with elevated permissions\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Roles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"{{roleId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Role (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"roleName\": \"MANAGER\",\n    \"roleDescription\": \"Updated manager role description\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"{{roleId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Role (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/roles/{{roleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"roles",
+								"{{roleId}}"
 							]
 						}
 					}
@@ -259,4 +432,3 @@
 		}
 	]
 }
-
