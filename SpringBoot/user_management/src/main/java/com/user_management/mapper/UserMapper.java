@@ -27,19 +27,16 @@ public class UserMapper {
     }
 
     private Set<String> extractRoleNames(Set<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return Set.of("USER");
+        }
         Set<String> roleNames = new HashSet<>();
-        if (roles != null && !roles.isEmpty()) {
-            Set<Role> rolesCopy = new HashSet<>(roles);
-            for (Role role : rolesCopy) {
-                if (role != null && role.getRoleName() != null) {
-                    roleNames.add(role.getRoleName());
-                }
+        for (Role role : roles) {
+            if (role != null && role.getRoleName() != null) {
+                roleNames.add(role.getRoleName());
             }
         }
-        if (roleNames.isEmpty()) {
-            roleNames.add("USER");
-        }
-        return roleNames;
+        return roleNames.isEmpty() ? Set.of("USER") : roleNames;
     }
 }
 

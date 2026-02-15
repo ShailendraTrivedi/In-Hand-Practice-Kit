@@ -1,5 +1,6 @@
 package com.user_management.security;
 
+import com.user_management.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,11 @@ public class PasswordService {
 
     public void validatePassword(String password) {
         if (password == null || password.isEmpty()) {
-            throw new RuntimeException("Password cannot be empty");
+            throw new ValidationException("Password cannot be empty");
         }
 
         if (password.length() < 6) {
-            throw new RuntimeException("Password must be at least 6 characters long");
+            throw new ValidationException("Password must be at least 6 characters long");
         }
 
         boolean hasUpperCase = false;
@@ -42,15 +43,15 @@ public class PasswordService {
         }
 
         if (!hasUpperCase) {
-            throw new RuntimeException("Password must contain at least one uppercase letter");
+            throw new ValidationException("Password must contain at least one uppercase letter");
         }
 
         if (!hasLowerCase) {
-            throw new RuntimeException("Password must contain at least one lowercase letter");
+            throw new ValidationException("Password must contain at least one lowercase letter");
         }
 
         if (!hasNumber) {
-            throw new RuntimeException("Password must contain at least one number");
+            throw new ValidationException("Password must contain at least one number");
         }
     }
 }
